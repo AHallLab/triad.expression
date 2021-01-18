@@ -1,5 +1,11 @@
 
 #' @export
+read_expression_data <- function(file) {
+  return(read_csv(file))
+  # TODO: Add validation of table.
+}
+
+#' @export
 filter_expression_for_factor_level <- function(expression, metadata, factor, level) {
   samples <- getSamplesForFactor(metadata, factor = factor, level = level)
   samples_in_expression <- samples[samples %in% colnames(expression)]

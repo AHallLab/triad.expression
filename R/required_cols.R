@@ -1,5 +1,7 @@
 
-
+#' Check a column exists in a data.frame / tibble.
+#'
+#' This is just an internal function to make code neater.
 checkColumns <- function(required, present, tbl_type) {
   missing <- required[!(required %in% present)]
   if(length(missing)){

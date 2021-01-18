@@ -1,6 +1,8 @@
-#' @importFrom fields rdist
-#' @import reshape2
-
+#' Make a matrix from a table of normalised mean expression values
+#'
+#' Putting the data into a matrix form makes it easy to do distances
+#' from centroids etc.
+#'
 #' @export
 mk_expression_matrix <- function(normalizedMeanExpression) {
   triadMatrix <- acast(as.data.frame(normalizedMeanExpression),
@@ -9,6 +11,12 @@ mk_expression_matrix <- function(normalizedMeanExpression) {
   triadMatrix[complete.cases(triadMatrix), ]
 }
 
+#' Compute the distances of each triad from a series of centroids
+#'
+#' The centroids used are:
+#'
+#' 1. The centroid for all triads (column means of a matrix of normalized)
+#'
 #' @export
 distances_from_centroids <- function(normalizedMeanExpression, lvl) {
   normalizedMeanExpression <- normalizedMeanExpression %>%

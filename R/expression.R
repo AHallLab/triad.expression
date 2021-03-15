@@ -1,6 +1,6 @@
 
 #' @export
-read_expression_data <- function(file) {
+read_expression <- function(file) {
   return(read_csv(file))
   # TODO: Add validation of table.
 }

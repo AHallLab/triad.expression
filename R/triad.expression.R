@@ -5,6 +5,7 @@
 #' @import ggplot2
 #' @import ggtern
 #' @import ggpubr
+#' @import GenomicRanges
 NULL
 
 

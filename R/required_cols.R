@@ -12,7 +12,7 @@ checkColumns <- function(required, present, tbl_type) {
              paste0(required, collapse = ", "),
              "\n",
              "missing column(s): ",
-             paste0(missingColumns, collapse = ", ")
+             paste0(missing, collapse = ", ")
       )
     )
   }

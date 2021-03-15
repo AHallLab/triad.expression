@@ -26,6 +26,8 @@ in an R session should install it for you.
 
 ## Example use
 
+### Computing expression categories of triads.
+
 First things first, load the package:
 
 ```R
@@ -95,4 +97,29 @@ Distances can be plotted in a figure of a ternary plot an accompanying boxplots 
 ```R
 make_expression_figure(centroidMat)
 ```
+
+### Locating triad genes in haplotype blocks
+
+The first step is to take the locations of triad genes, and place them into haplotype blocks.
+
+So let's open the triad gene location data, and haplotype block location data...
+
+```R
+geneLocations <- load_gene_locations("triad_locations")
+haplotypeLocations <- load_haplotype_locations("haplotype_locations.tsv")
+```
+
+Ok, once the gene and haplotype block locations are known, we can combine the two to place the triad genes
+into haplotype blocks...
+
+```R
+placedTriadGenes <- place_genes_into_haplotypes(haplotypeLocations, geneLocations)
+```
+
+Now the triad genes placed into blocks, and the output from the `distance_from_centroids` function, can be combined to make a table summarizing how many triads of different types (Central, A.dominant, etc...) are present in each haplotype block.
+
+```R
+blockExpressionCounts <- count_triad_expressions_for_all_blocks(placedTriadGenes, centroidMat)
+```
+
 

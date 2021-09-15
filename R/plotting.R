@@ -3,19 +3,19 @@
 #'
 #' @export
 make_expression_boxplot <- function(data) {
-  boxplotFont <- element_text(face = "bold", size = 12, colour = "Black")
+  boxplotFont <- ggplot2::element_text(face = "bold", size = 12, colour = "Black")
 
-  boxplotTheme <- theme_light() +
+  boxplotTheme <- ggplot2::theme_light() +
     theme(legend.position = "none",
           axis.text.x = boxplotFont,
           axis.text.y = boxplotFont,
           axis.title.y = boxplotFont,
-          plot.title = element_text(face = "bold",
+          plot.title = ggplot2::element_text(face = "bold",
                                     size = 12,
                                     hjust = 0.5,
                                     colour = "black"))
 
-  dat.m <- melt(data, id.vars = 'clust.description', measure.vars = c('A', 'B', 'D'))
+  dat.m <- reshape2::melt(data, id.vars = 'clust.description', measure.vars = c('A', 'B', 'D'))
 
   dat.m$clust.description <- factor(
     dat.m$clust.description,
@@ -25,7 +25,7 @@ make_expression_boxplot <- function(data) {
 
   palette <- c("#999999", "#9DD584", "#30BFEB", "#FFC929", "#469C3B", "#3D2374", "#F18931")
 
-  ggarrange(ggplot(dat.m, aes(x = variable, y = value, fill = clust.description)) +
+  ggarrange(ggplot(dat.m, aes(x = .data$variable, y = .data$value, fill = .data$clust.description)) +
     geom_boxplot() +
     boxplotTheme +
     labs(title = NULL,
@@ -42,14 +42,12 @@ make_expression_boxplot <- function(data) {
 make_expression_ternplot <- function(data) {
   palette <- c("#999999", "#9DD584", "#30BFEB", "#FFC929", "#469C3B", "#3D2374", "#F18931")
 
-  data$clust.description <- factor(
-    data$clust.description,
-    levels = c("A.dominant", "B.dominant", "D.dominant", "Central",
-               "A.suppressed", "B.suppressed", "D.suppressed")
-  )
+  data <- data %>%
+    select(.data$A, .data$B, .data$D, .data$clust.description) %>%
+    distinct()
 
-  ggtern(data, aes(x = A, y = B, z = D)) +
-    geom_point(aes(colour = clust.description), alpha = 0.5) +
+  ggtern(data, aes(x = .data$A, y = .data$B, z = .data$D)) +
+    geom_point(aes(colour = .data$clust.description), alpha = 0.5) +
     theme_bw() +
     theme(legend.text = element_text(size = 12),
           axis.text.x = element_text(face = "bold", size = 12, colour = "black"),
@@ -71,4 +69,26 @@ make_expression_ternplot <- function(data) {
 make_expression_figure <- function(data) {
   grid.arrange(make_expression_ternplot(data),
                make_expression_boxplot(data), ncol = 2)
+}
+
+
+#'
+#' @export
+loom_plot <- function(distWithAnnotation, positionVar, yVar, geneVar, colourVar, xLab = "Position (Mb)", yLab = "Subgenome", colourLab = "Expression Category", arrangeWrap = T) {
+  pFrame <- distWithAnnotation[,c(positionVar, yVar, geneVar, colourVar)]
+  colnames(pFrame) <- c("xx", "yy", "gg", "cc")
+
+  p <- ggplot(pFrame, aes(x = .data$xx, y = .data$yy, group = .data$gg)) +
+                   geom_path() +
+                   geom_point(aes(color = .data$cc)) +
+                   xlab(xLab) +
+                   ylab(yLab) +
+                   scale_color_brewer(name = colourLab, palette = "Set1") +
+                   scale_x_continuous(labels = function(x) format(x / 1000000))
+
+  if(arrangeWrap) {
+    return(ggarrange(p))
+  } else {
+    return(p)
+  }
 }

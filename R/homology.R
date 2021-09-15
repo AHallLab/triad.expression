@@ -4,8 +4,8 @@ validateHomologyTable <- function(tbl) {
 }
 
 #' @export
-read_homology <- function(filename) {
-  tbl <- read_csv(filename)
+read_homology <- function(filename = triadInfo$homology_path) {
+  tbl <- read.table(filename, header = T)
   validateHomologyTable(tbl)
   return(tbl)
 }

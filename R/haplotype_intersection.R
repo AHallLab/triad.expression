@@ -2,9 +2,9 @@
 #'
 #' @export
 load_gene_locations <- function(folder) {
-  files <- list.files("triad_locations")
+  files <- list.files(folder)
   files <- files[grepl(".tsv", files)]
-  triadTable <- do.call(rbind, lapply(files, function(x) {
+  triadTables <- lapply(files, function(x) {
     tbl <- as_tibble(read.delim(paste0(folder, '/', x)))
     dtbl <- distinct(tbl)
     if(nrow(tbl) > nrow(dtbl)) {
@@ -12,9 +12,9 @@ load_gene_locations <- function(folder) {
     }
     dtbl$race <- unlist(strsplit(x, "_"))[1]
     return(dtbl)
-  }))
-  checkColumns(c("Chr", "Start", "End", "Strand", "Gene", "TriadGrp", "race"), colnames(triadTable), "triad location")
-  return(triadTable)
+  })
+  #checkColumns(c("Chr", "Start", "End", "Strand", "Gene", "TriadGrp", "race"), colnames(triadTable), "triad location")
+  return(triadTables)
 }
 
 #'
@@ -49,8 +49,6 @@ place_genes_in_blocks_for_assembly <- function(blocks, triads, assm) {
   return(r)
 }
 
-#'
-#' @export
 place_genes_into_haplotypes <- function(haplotypeBlockTable, geneLocationTable) {
   # Limit datasets to the genomes / races present in both gene data, and haplotype data.
   genomes <- intersect(unique(haplotypeBlockTable$assembly), unique(geneLocationTable$race))
@@ -64,8 +62,6 @@ place_genes_into_haplotypes <- function(haplotypeBlockTable, geneLocationTable) 
   return(placedGenes)
 }
 
-#'
-#' @export
 count_triad_expressions_for_block <- function(gene_haplo_tbl, triad_expression_matrix, block) {
   triad_groups <- gene_haplo_tbl[gene_haplo_tbl$block_no == block, "TriadGrp"]
   block_expressions <- triad_expression_matrix[triad_expression_matrix$group_id %in% triad_groups, ]
@@ -82,8 +78,6 @@ count_triad_expressions_for_block <- function(gene_haplo_tbl, triad_expression_m
   return(df)
 }
 
-#'
-#' @export
 count_triad_expressions_for_all_blocks <- function(gene_haplo_tbl, triad_expression_matrix) {
   blocks <- unique(gene_haplo_tbl$block_no)
   return(do.call(rbind, lapply(blocks, function(block) {

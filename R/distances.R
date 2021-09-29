@@ -14,11 +14,15 @@ mk_expression_matrix <- function(normalizedMeanExpression) {
 #'
 #' @export
 centroid_distances <- function(normalizedMeanExpression, factorList = NULL) {
-  if(is.null(factorList)){
-    # Auto-detect the factor-columns.
-    tblNames <- colnames(normalizedMeanExpression)
-    factorList <- tblNames[!(tblNames %in% c("mean", "gene", "samples", "subgenome", "group_id", "triad_sum", "normalised_mean"))]
-    warning(paste0("Detected factor columns. Setting factorList to ", paste0(factorList, collapse = ", ")))
+  if(is.null(factorList)) {
+    if(!is.null(attributes(normalizedMeanExpression)$factorList)){
+      factorList <- attributes(normalizedMeanExpression)$factorList
+    } else {
+      # Auto-detect the factor-columns.
+      tblNames <- colnames(normalizedMeanExpression)
+      factorList <- tblNames[!(tblNames %in% c("mean", "gene", "samples", "subgenome", "group_id", "triad_sum", "normalised_mean"))]
+      warning(paste0("Detected factor columns. Setting factorList to ", paste0(factorList, collapse = ", ")))
+    }
   }
 
   # Central, A, B, or D dominant, or A, B, or D suppressed.
@@ -30,7 +34,7 @@ centroid_distances <- function(normalizedMeanExpression, factorList = NULL) {
                                       "A.dominant", "B.dominant", "D.dominant",
                                       "A.suppressed", "B.suppressed","D.suppressed")
 
-  normalizedMeanExpression %>%
+  result <- normalizedMeanExpression %>%
     group_by(across(all_of(factorList))) %>%
     group_modify(~ {
       triadMatrix <- mk_expression_matrix(.x)
@@ -45,9 +49,21 @@ centroid_distances <- function(normalizedMeanExpression, factorList = NULL) {
                clust.description = minDesc) %>%
         inner_join(.x, by = "group_id")
     }) %>% ungroup
+
+  attributes(result)$factorList <- factorList
+  return(result)
 }
 
+#' @export
+join_distances_and_annotation <- function(distances, annotation, by = c("group_id" = "group_id", "High.level.variety" = "variety", "subgenome" = "subgenome")){
+  return(distances %>%
+           left_join(annotation, by = by) %>%
+           rename(cs.gene = .data$gene.x, variety.gene = .data$gene.y))
+}
 
+limit_to_regions <- function() {
+
+}
 
 
 

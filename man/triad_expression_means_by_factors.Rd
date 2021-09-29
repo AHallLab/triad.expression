@@ -16,5 +16,5 @@ triad_expression_means_by_factors(expression, metadata, homology, factorList)
 \item{factorList}{A string of a metadata column name to use as a factor.}
 }
 \description{
-NEWNEWNEW
+Compute mean expression for each triad for each combination of factor levels.
 }

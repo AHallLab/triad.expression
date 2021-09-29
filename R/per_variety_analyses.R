@@ -1,12 +1,4 @@
 
-#' @export
-join_distances_and_annotation <- function(distances, annotation, by = c("group_id" = "group_id", "High.level.variety" = "variety", "subgenome" = "subgenome")){
-  return(distances %>%
-           left_join(annotation, by = by) %>%
-           rename(cs.gene = .data$gene.x, variety.gene = .data$gene.y))
-}
-
-
 #'
 #' @export
 pv_xy_plot <- function(pvAnnotatedDistances, varX, varY, chrom) {

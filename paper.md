@@ -1,5 +1,5 @@
 ---
-title: 'triad.expression: Analysing '
+title: 'triad.expression: Analysis and visualization of Wheat gene triad expression patterns'
 tags:
   - R
   - bioinformatics
@@ -136,38 +136,66 @@ cDistances <- centroid_distances(normalizedMeans)
 
 ### Ternary plots
 
-Once you have computed centroid distancesm `triad.expression` helps you produce ternary plots
+Once you have computed centroid distances `triad.expression` helps you produce ternary plots
 through the `make_expression_ternplot` function.
-Some filtering of the computed centroid distances data may be necessary.
+Some filtering of the computed centroid distances data may be necessary, as in the example below.
 
 ```R
 library(dplyr)
 cDistances %>%
-  # Only want to plot the data for aerial organ tissue and the ARI variety.
-  filter(High.level.tissue == "aerial organs", High.level.variety == "ARI") %>%
+  # We only want to plot the data for aerial organ
+  # tissue and the ARI variety.
+  filter(High.level.tissue == "aerial organs",
+         High.level.variety == "ARI") %>%
   make_expression_ternplot
 ```
 
-The resulting ternary plots look like \autoref{fig:exampletern}:
+The resulting ternary plots look like the example in \autoref{fig:exampletern}:
 
 ![An example ternary plot.\label{fig:exampletern}](example_ternaryplot.png)
 
-# Mathematics
 
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
+### Loom plots
 
-Double dollars make self-standing equations:
+Structural rearrangements of the genome that have occurred during Wheat's evolutionary history,
+may be linked to changes in a Triad's expression pattern. In addition so could other spatial factors
+such as where a triad exists in the genome.
 
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
+To help visualize such phenomena `triad.expression` provides a function called `loom_plot`.
+Depending on how you preprocess the data you can visualize a few different phenomena with it.
 
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
+The first step is typically to merge your computed triad distances with the gene_locations data provided in
+`triad.expression`, or your own:
+
+```R
+data(gene_locations)
+distWithLocation <- join_distances_and_annotation(cDistances, gene_locations)
+```
+
+From here, this data can be pre-processed and passed to the `loom_plot` function.
+In this case, the data is limited to only one chromosome, 2A, and to the root tissue.
+Then it is filtered to exclude triads that don't ever differ in expression pattern between
+the different Wheat varieties.
+
+The `loom_plot` function accepts a variable to use as the x-axis, y-axis, for drawing the connecting lines, and for color.
+In the example blow the x-axis is the start position of every triad gene, High.level.variety is the y-axis, group_id (triad)
+is used to draw the connecting lines, and clust.description (expression pattern) is used for color.
+
+```R
+distWithLocation %>%
+  # Limit to Chromosome 2A, and the root tissue.
+  filter(chr == "chr2A", High.level.tissue == "root")  %>%
+  # Exclude triads that never differ in expression between the different wheat varieties.
+  group_by(group_id) %>%
+  filter(n_distinct(clust.description) > 1) %>%
+  # Plot!
+  loom_plot("start", "High.level.variety", "group_id", "clust.description", yLab = "Variety")
+```
+
+The resulting loom plot looks like the example in \autoref{fig:exampleloom}:
+
+![An example loom plot.\label{fig:exampleloom}](example_loomplot.png)
+
 
 # Citations
 

@@ -106,14 +106,19 @@ data(expression_data)
 data(expression_metadata)
 data(triad_homology)
 
-meanExpressionByVarietyAndTissue <- triad_expression_means_by_factors(expression_data, expression_metadata, triad_homology, c("High.level.variety", "High.level.tissue"))
+meanExpressionByVarietyAndTissue <-
+    triad_expression_means_by_factors(expression_data,
+                                      expression_metadata,
+                                      triad_homology,
+                                      c("High.level.variety", "High.level.tissue"))
 ```
 
 Once these values have been computed, you can normalize the data, which is done with the
 `normalize_triad_expression_means` function.
 
 ```R
-normalizedMeans <- normalize_triad_expression_means(meanExpressionByVarietyAndTissue)
+normalizedMeans <- 
+    normalize_triad_expression_means(meanExpressionByVarietyAndTissue)
 ```
 
 Once you have normalized mean triad expression data, using the `centroid_distances` function,
@@ -185,11 +190,16 @@ is used to draw the connecting lines, and clust.description (expression pattern)
 distWithLocation %>%
   # Limit to Chromosome 2A, and the root tissue.
   filter(chr == "chr2A", High.level.tissue == "root")  %>%
-  # Exclude triads that never differ in expression between the different wheat varieties.
+  # Exclude triads that never differ in expression between
+  # the different wheat varieties.
   group_by(group_id) %>%
   filter(n_distinct(clust.description) > 1) %>%
   # Plot!
-  loom_plot("start", "High.level.variety", "group_id", "clust.description", yLab = "Variety")
+  loom_plot("start",
+            "High.level.variety",
+            "group_id",
+            "clust.description",
+            yLab = "Variety")
 ```
 
 The resulting loom plot looks like the example in \autoref{fig:exampleloom}:

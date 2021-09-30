@@ -41,25 +41,41 @@ between factor levels such as variety.
 
 # Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+The wheat genome has a complex structure consisting of three subgenomes, named
+A, B, and D, and it is highly repetitive.
+As a result of this structure, for any gene you might pick from any subgenome,
+there are often homologous genes (i.e. related in position structure and
+function, typically as a result of evolutionary relatedness) in the other two
+sub genomes. Each set of three related genes is called a Triad. Each gene in a
+Triad may have different expression levels and each Triad may be categorized
+into one of seven different expression categories, and these categories may
+change between types of tissue, between different cultivars of wheat, and other
+factors.
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+Computing the expression categories of Triads, and looking for patterns and
+changes in expression categories between Wheat variety, tissue, or other
+factors requires the integration of many different kinds of data, including,
+but not necessarily limited to:
+
+- Expression data from RNA sequencing experiments.
+- Metadata describing those experiments.
+- Data describing the Triad homologies (i.e. which genes belong to which triad).
+- Annotation data describing the genomic locations of genes, in different Wheat
+  varieties.
+
+The `triad.expression` has been created to help make the process of computing
+Triad expression categories and analyzing patterns and differences in those
+categories for various factors much easier. It does so by both providing the
+functions that compute these analyses from data, but also by providing some
+pre-prepared sets of the data just listed above. Any or all of which may be
+swapped out with new data if the user has some generated.
+
+`triad.expression` has already been used in a number of scientific
+publications [], and the feature set and data provided continues to be updated
+as more Wheat Bioinformatics projects use it for more use-cases. This package
+will continue to make it trivial to explore the effects of many different
+biological factors on Triad expression patterns, helping anyone working
+to better understand the genomic underpinnings of Wheat's biology.
 
 # Features of `triad.expression`
 
@@ -110,7 +126,8 @@ meanExpressionByVarietyAndTissue <-
     triad_expression_means_by_factors(expression_data,
                                       expression_metadata,
                                       triad_homology,
-                                      c("High.level.variety", "High.level.tissue"))
+                                      c("High.level.variety",
+                                        "High.level.tissue"))
 ```
 
 Once these values have been computed, you can normalize the data, which is done with the
@@ -206,29 +223,6 @@ The resulting loom plot looks like the example in \autoref{fig:exampleloom}:
 
 ![An example loom plot.\label{fig:exampleloom}](example_loomplot.png)
 
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-# Figures
-
-Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
-
-Figure sizes can be customized by adding an optional second parameter:
-![Caption for example figure.](figure.png){ width=20% }
 
 # Acknowledgements
 

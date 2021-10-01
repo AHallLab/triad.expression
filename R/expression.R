@@ -1,17 +1,31 @@
 
-filter_expression_for_factor_level <- function(expression, metadata, factor, level) {
-  samples <- getSamplesForFactor(metadata, factor = factor, level = level)
-  samples_in_expression <- samples[samples %in% colnames(expression)]
-  return(expression[, c("gene", samples_in_expression)])
+# filter_expression_for_factor_level <- function(expression, metadata, factor, level) {
+#   samples <- getSamplesForFactor(metadata, factor = factor, level = level)
+#   samples_in_expression <- samples[samples %in% colnames(expression)]
+#   return(expression[, c("gene", samples_in_expression)])
+# }
+#
+# filterExpressionForVarietyAndFactorLevel <- function(expression, metadata, variety, varietyCol, level, factorCol) {
+#   samples <- getSamplesForVarietyAndFactor(metadata, varietyCol, variety, factorCol, level)
+#   samples_in_expression <- samples[samples %in% colnames(expression)]
+#   return(expression[, c("gene", samples_in_expression)])
+# }
+
+getSamplesForFactors <- function(metadata, factorList) {
+  conditions <- lapply(names(factorList), function(factor) {
+    level <- factorList[[factor]]
+    return(metadata[[factor]] == level)
+  })
+  if(length(conditions) > 1) {
+    conditions <- do.call("&", conditions)
+  } else {
+    conditions <- unlist(conditions)
+  }
+  return(metadata$Sample.IDs[conditions])
 }
 
-filterExpressionForVarietyAndFactorLevel <- function(expression, metadata, variety, varietyCol, level, factorCol) {
-  samples <- getSamplesForVarietyAndFactor(metadata, varietyCol, variety, factorCol, level)
-  samples_in_expression <- samples[samples %in% colnames(expression)]
-  return(expression[, c("gene", samples_in_expression)])
-}
-
-# NEWNEWNEW
+#' Filter a gene expression data set to specific combination of factor levels, based on the metadata describing the samples.
+#'
 filterExpressionForFactors <- function(expression, metadata, factorList) {
   samples <- getSamplesForFactors(metadata, factorList)
   samplePresent <- samples %in% colnames(expression)
@@ -28,16 +42,13 @@ filterExpressionForFactors <- function(expression, metadata, factorList) {
   return(subset(expression, select = c("gene", samples_in_expression)))
 }
 
-gene_expression_means <- function(expression) {
-  mean_values <- expression %>% select(-.data$gene) %>% rowMeans
-  tibble(
-    mean = mean_values,
-    gene = expression$gene,
-    samples = ncol(expression) - 1
-  )
-}
-
-#NEWNEWNEW
+#' Compute mean expression for each gene, for a single combination of factor levels.
+#'
+#' @param expression A data frame of expression values in which each column is a sample, and each row is a single gene.
+#' @param metadata A data frame containing metadata for each sample.
+#' @param factorLevels A List that represents a dictionary of factor and level.
+#'
+#'
 gene_expression_means_for_factor_levels <- function(expression, metadata, factorLevels) {
   filteredExpression <- filterExpressionForFactors(expression, metadata, factorLevels)
   mean_values <- filteredExpression %>% select(-gene) %>% rowMeans
@@ -48,7 +59,14 @@ gene_expression_means_for_factor_levels <- function(expression, metadata, factor
   )
 }
 
-#NEWNEWNEW
+#' Compute mean expression for each gene for every combination of factor levels.
+#'
+#' @param expression A data frame of expression values in which each column is a sample, and each row is a single gene.
+#' @param metadata A data frame containing metadata for each sample.
+#' @param homology A data frame of metadata about each triad. Include which genes make them up on the A, B, and D genomes.
+#' @param factorList A string of a metadata column name to use as a factor.
+#'
+#' @export
 gene_expression_means_by_factors <- function(expression, metadata, factorList) {
   factorLevels <- lapply(factorList, function(factor) { unique(metadata[[factor]]) })
   names(factorLevels) <- factorList
@@ -68,6 +86,13 @@ gene_expression_means_by_factors <- function(expression, metadata, factorList) {
 #' @param metadata A data frame containing metadata for each sample.
 #' @param homology A data frame of metadata about each triad. Include which genes make them up on the A, B, and D genomes.
 #' @param factorList A string of a metadata column name to use as a factor.
+#'
+#' @examples
+#' data(expression_data)
+#' data(expression_metadata)
+#' data(triad_homology)
+#'
+#' meanExpressionByVarietyAndTissue <- triad_expression_means_by_factors(expression_data, expression_metadata, triad_homology, c("High.level.variety", "High.level.tissue"))
 #'
 #' @export
 triad_expression_means_by_factors <- function(expression, metadata, homology, factorList) {

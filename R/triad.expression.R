@@ -9,6 +9,72 @@
 #' @import ggtern
 NULL
 
+#' An example gene expression data-set.
+#'
+#' A dataset containning gene expression results of 102,442 genes
+#' from 232 samples.
+#'
+#' Each row represents a single gene.
+#' The column 'gene', has the name of the gene and all other columns
+#' are separate samples for which the levels of expression of each gene
+#' were measured.
+#'
+#' Note: The data comes from many varieties of wheat, but in this data-set,
+#' the gene names are all Chinese Spring based, for all varieties.
+#' So for example, values in the data-set for gene "TraesCS3A02G200800",
+#' from a sample taken from the variety ARI, simply correspond to the gene
+#' in ARI that is the homologue of the Chinese Spring gene "TraesCS3A02G200800".
+#'
+#' @docType data
+#' @usage data(expression_data)
+#' @format A data frame with 102442 rows and 233 variables.
+#' @keywords datasets
+"expression_data"
+
+#' An example gene annotation data-set
+#'
+#'
+#' Each row corresponds to a single gene's location in a single genome of a variety of wheat.
+#'
+#' \itemize{
+#'   \item chr. chromosome the gene exists in
+#'   \item start. the base position in the genome, of the first base in the gene
+#'   \item end. the base position in the genome, of the final base in the gene
+#'   \item strand. which strand the gene exists on. Either '+' or '-'
+#'   \item gene. the variety specific name of the gene
+#'   \item group_id. the ID of the triad the gene belongs in
+#'   \item variety. the variety of wheat
+#'   \item subgenome. the subgenome of wheat the gene exists in ('A', 'B', or 'D')
+#' }
+#'
+#' @docType data
+#' @usage data(gene_locations)
+#' @format A tibble with 318649 rows and 8 variables
+#' @keywords datasets
+"gene_locations"
+
+#' An example region dataset
+#'
+#' An example dataset of some genomic regions identified in this paper [todo].
+#'
+#' The variables are:
+#'
+#' \itemize{
+#'   \item chr. chromosome the region exists in
+#'   \item start. the base position in the genome of the first base of the region
+#'   \item end. the base position in the genome of the final base of the region
+#'   \item High.level.variety. The wheat variety this region was identified in
+#' }
+#'
+#' @docType data
+#' @usage data(wicker_te_regions)
+#' @format A data frame with 320 rows and 4 variables
+#' @keywords datasets
+"wicker_te_regions"
+
+
+
+
 varietyInfo <- new.env()
 
 varietyInfo$tags <- c("ARI", "JAG", "JUL", "LER", "LAN", "MAC", "NOR", "STA")

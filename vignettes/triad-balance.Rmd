@@ -1,0 +1,120 @@
+---
+title: "Computing Triad expression balance"
+author: "Ben J. Ward"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Computing Triad expression balance}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Required data
+
+To begin to compute Triad expression balance, we need three sources 
+of data:
+
+1. Gene expression data
+2. Gene expression metadata
+3. Triad homology data
+
+As an example, we will use the ones provided with the package.
+
+```{r, warning=FALSE}
+library(triad.expression)
+
+data(expression_data)
+data(expression_metadata)
+data(triad_homology)
+```
+
+## Computing mean expression levels
+
+Before we compute the Triad expression balance, we must first compute
+the mean expression for each gene in each triad.
+We do this with the function `triad_expression_means_by_factors`.
+
+This function takes the expression datasets, and the triad homology 
+information, and a list of metadata column names to use as factor 
+groupings.
+
+For example, in `expression_metadata`, there is a column called 
+"High.level.variety", with a level for each variety of wheat.
+
+To compute the mean expression level for each triad gene, for each 
+variety then, we can use the function like so, passing in the 
+expression and homology data, and "High.level.variety" as our factor.
+
+```{r}
+meanExpressionByVariety <- triad_expression_means_by_factors(
+  tibble::as_tibble(expression_data),
+  expression_metadata,
+  tibble::as_tibble(triad_homology),
+  "High.level.variety"
+)
+```
+
+This function can also handle multiple factors.
+
+For example, what if you wanted to look at triad expression between
+varieties, AND also for different tissues?
+
+The metadata table we are using, also has a column called 
+"High.level.tissue", and so clearly some expression experiments used 
+samples from different wheat tissues. The column has several levels 
+such as "roots", "leaves/shoots", etc.
+
+```{r}
+meanExpressionByVarietyAndTissue <- triad_expression_means_by_factors(
+  tibble::as_tibble(expression_data),
+  expression_metadata,
+  triad_homology,
+  c("High.level.variety", "High.level.tissue")
+)
+```
+
+The resulting table contains the mean expression of each gene, for
+every combination of factor levels - in this case for every combo of
+"High.level.variety" and "High.level.tissue".
+
+Next we have to normalize the data, which is done with the function 
+`normalize_triad_expression_means`.
+
+```{r}
+normalizedMeans <- normalize_triad_expression_means(
+  meanExpressionByVarietyAndTissue
+)
+```
+
+By default, this function is able to work out which columns are 
+factors from the previous step (in this instance, "High.level.tissue"
+and "High.level.variety") but you can optionally override this should
+it be necessary (it probably won't be).
+
+
+## Computing triad expression balance
+
+Once you have normalized mean triad expression data, you can compute
+each triads expression balance, there are 7 different expression
+balances that could be assigned to each triad as a result.
+
+- Central
+- A dominant
+- B dominant
+- C dominant
+- A suppressed
+- B suppressed
+- D suppressed
+
+```{r}
+eBalances <- triad_balance(normalizedMeans)
+```
+
+By default, as with the `normalize_triad_expression_means` function,
+this function is able to work out which columns are factors from the 
+previous steps (in this instance, "High.level.tissue" and 
+"High.level.variety") but you can optionally override this should it
+be necessary (again, it probably won't be).
+
+And that's it, you've got a data set of the expression balance of 
+each triad!

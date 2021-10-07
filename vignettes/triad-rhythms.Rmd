@@ -1,0 +1,32 @@
+---
+title: "Plotting Triad circadian rhythms"
+author: "Ben J. Ward"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plotting Triad circadian rhythms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Required data
+
+To begin to compute Triad expression balance, we need three sources 
+of data:
+
+1. Gene expression data
+2. Gene expression metadata
+3. Triad homology data
+
+As an example, we will use the ones provided with the package.
+
+```{r, warning=FALSE}
+library(triad.expression)
+
+data("triad_homology")
+rawTable <- read.csv("inst/extdata/circadian/q_values.csv", header = T)
+csLocations <- read.table("inst/extdata/cs_Gene_loc.csv", header = T) # Is actually a tsv.
+triadsFlat <- triad.expression:::reshape_homology_triads(triad_homology)
+```
+
+

@@ -1,0 +1,8 @@
+reference:
+- title: "Provided Datasets"
+  desc: >
+    Example datasets bundled into triad.expression.
+- contents:
+  - expression_data
+  - gene_locations
+  - wicker_te_regions

@@ -74,12 +74,19 @@ make_expression_figure <- function(data) {
 
 #'
 #' @export
-loom_plot <- function(distWithAnnotation, positionVar, yVar, geneVar, colourVar, xLab = "Position (Mb)", yLab = "Subgenome", colourLab = "Expression Category", arrangeWrap = T) {
+loom_plot <- function(distWithAnnotation, positionVar, yVar, geneVar, colourVar, colourLines = F, xLab = "Position (Mb)", yLab = "Subgenome", colourLab = "Expression Balance", arrangeWrap = T) {
   pFrame <- distWithAnnotation[,c(positionVar, yVar, geneVar, colourVar)]
   colnames(pFrame) <- c("xx", "yy", "gg", "cc")
+  pFrame$cc <- as.factor(pFrame$cc)
+
+  if(colourLines) {
+    pathGeom <- geom_path(aes(color = .data$cc))
+  } else {
+    pathGeom <- geom_path()
+  }
 
   p <- ggplot(pFrame, aes(x = .data$xx, y = .data$yy, group = .data$gg)) +
-                   geom_path() +
+                   pathGeom +
                    geom_point(aes(color = .data$cc)) +
                    xlab(xLab) +
                    ylab(yLab) +
@@ -91,4 +98,24 @@ loom_plot <- function(distWithAnnotation, positionVar, yVar, geneVar, colourVar,
   } else {
     return(p)
   }
+}
+
+pv_xy_plot <- function(pvAnnotatedDistances, varX, varY, chrom) {
+  data <- do.call(rbind, pvAnnotatedDistances[c(varX, varY)]) %>%
+    select(.data$group_id, .data$clust, .data$gene, .data$subgenome, .data$variety, .data$Chr, .data$Start, .data$End, .data$Strand, .data$Gene) %>%
+    filter(.data$Chr == chrom) %>%
+    arrange(.data$group_id)
+  plotTbl <- data %>%
+    group_by(.data$group_id) %>%
+    summarize(diff = .data$clust[1] != .data$clust[2], x = .data$Start[1], y = .data$Start[2]) %>%
+    na.omit()
+  pvPlot <- ggplot(plotTbl, aes(x = .data$x, y = .data$y, colour = .data$diff, shape = .data$diff, alpha = .data$diff)) +
+    geom_point()
+  return(
+    list(
+      plt = pvPlot,
+      data = data,
+      plot_tbl = plotTbl
+    )
+  )
 }
